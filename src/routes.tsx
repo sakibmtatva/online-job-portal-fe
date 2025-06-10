@@ -13,6 +13,7 @@ const Register = React.lazy(() => import("./pages/Register"));
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 const Dashboard = React.lazy(() => import("./pages/Dashboard"));
 const Settings = React.lazy(() => import("./pages/Settings"));
+const Resume = React.lazy(() => import("./pages/Resume/ResumeBiilder"));
 const PostJob = React.lazy(() => import("./pages/PostJob"));
 const EmployerListing = React.lazy(
   () => import("./pages/Listing/EmployerListing")
@@ -47,6 +48,8 @@ const JobApplication = React.lazy(
   () => import("./pages/JobApplication/JobApplication")
 );
 const ContactPage = React.lazy(() => import("./pages/FooterPages/ContactUs"));
+const Subscriptions = React.lazy(() => import("./pages/Subscriptions"))
+const PaymentSuccess = React.lazy(() => import("./pages/Subscriptions/Success"))
 
 const LoadingFallback = () => (
   <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-purple-100">
@@ -168,6 +171,10 @@ export const router = createBrowserRouter([
         path: "/settings",
         element: <ProtectedRoute element={withSuspense(Settings)} />,
       },
+        {
+        path: "/resumeBuilder/:id",
+        element: <ProtectedRoute element={withSuspense(Resume)} />,
+      },
       {
         path: "/postjob",
         element: <ProtectedRoute element={withSuspense(PostJob)} />,
@@ -207,6 +214,14 @@ export const router = createBrowserRouter([
       {
         path: "/contact",
         element: withSuspense(ContactPage),
+      },
+      {
+        path: "/subscriptions",
+        element: withSuspense(Subscriptions)
+      },
+      {
+        path: "/paymentSuccess/:sessionId",
+        element: withSuspense(PaymentSuccess)
       },
       {
         path: "*",

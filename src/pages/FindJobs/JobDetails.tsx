@@ -18,6 +18,7 @@ import {
   MapPin,
   BookmarkCheck,
   Type,
+  Clock,
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import moment from "moment";
@@ -26,6 +27,11 @@ import { SingleJob } from "../../utility/interface/IJobResponse";
 import bookmarkService from "../../services/bookmark-service";
 import ApplyJobDialog from "../../components/custom/ApplyJobModal";
 import { getJobTypeLabel, LoadingSpinner } from "../../components/Common";
+import schedulemeetingService, {
+  Meeting,
+} from "../../services/schedulemeeting-service";
+import { dismissMeeting } from "../../features/meeting/meetingSlice";
+import { useDispatch } from "react-redux";
 
 const JobDetails: React.FC = () => {
   const { jobId } = useParams<{ jobId: string }>();
@@ -37,6 +43,8 @@ const JobDetails: React.FC = () => {
   );
   const token = useSelector((state: RootState) => state.auth.token);
   const [isOpen, setIsOpen] = useState(false);
+  const [meetingsData, setMeetingsData] = useState<Meeting[]>([]);
+  const dispatch = useDispatch();
 
   const handleStateChange = (open: boolean) => {
     setIsOpen(open);
@@ -51,6 +59,21 @@ const JobDetails: React.FC = () => {
       console.error(e);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const getCandidateScheduleList = async () => {
+    try {
+      const response =
+        await schedulemeetingService.getCandidateScheduleMeetingsList();
+      if (response?.data?.data) {
+        const result = response?.data?.data?.filter(
+          (meeting: Meeting) => meeting.job._id === jobId
+        );
+        setMeetingsData(result);
+      }
+    } catch (error) {
+      console.error("Error fetching meetings:", error);
     }
   };
 
@@ -85,8 +108,14 @@ const JobDetails: React.FC = () => {
   useEffect(() => {
     if (jobId) {
       getSingleJobData(jobId, true);
+      getCandidateScheduleList();
     }
   }, []);
+
+  const joinMeeting = (meeting: Meeting) => {
+    dispatch(dismissMeeting(meeting._id));
+    window.location.href = `/meeting/${meeting._id}`;
+  };
 
   return (
     <>
@@ -328,6 +357,75 @@ const JobDetails: React.FC = () => {
                             {jobData?.category}
                           </span>
                         </div>
+                      </div>
+                    </div>
+                    {/* Job meetings */}
+                    <div className="bg-white p-4 rounded-lg border-2 border-[#E7F0FA]">
+                      <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                        {UI_TEXT.scheduledMeetings}
+                      </h2>
+
+                      <div className="flex flex-col gap-2">
+                        {meetingsData?.map((meeting: Meeting) => (
+                          <div
+                            key={meeting._id}
+                            className="p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                          >
+                            <div className="flex flex-col w-full">
+                              <div className="flex flex-col gap-2 text-sm">
+                                <div className="flex gap-1.5">
+                                  <span className="text-gray-600">
+                                    Scheduled for:
+                                  </span>
+                                </div>
+                                <div className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4">
+                                  <div className="flex items-center gap-2 w-full md:w-auto">
+                                    <Calendar className="h-5 w-5 text-blue-500 flex-shrink-0" />
+                                    <span className="font-semibold text-gray-900 break-words">
+                                      {moment(meeting.date).format(
+                                        "DD MMM, YYYY"
+                                      )}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-2 w-full md:w-auto">
+                                    <span className="hidden md:inline text-gray-400">
+                                      &bull;
+                                    </span>
+                                    <Clock className="h-5 w-5 text-blue-500 flex-shrink-0" />
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <span className="font-semibold text-gray-900">
+                                        {meeting.start_time}
+                                      </span>
+                                      <span className="text-gray-400">to</span>
+                                      <span className="font-semibold text-gray-900">
+                                        {meeting.end_time}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {meeting.status === "Scheduled" &&
+                                moment(meeting.date).isSame(moment(), "day") &&
+                                moment(
+                                  meeting.start_time,
+                                  "HH:mm"
+                                ).isSameOrBefore(moment()) &&
+                                moment(meeting.end_time, "HH:mm").isAfter(
+                                  moment()
+                                ) && (
+                                  <div className="mt-4 w-full">
+                                    <button
+                                      onClick={() => joinMeeting(meeting)}
+                                      className="w-full md:w-auto bg-green-50 text-green-600 py-2.5 px-6 rounded-md hover:bg-green-100 transition-colors font-medium text-sm cursor-pointer"
+                                    >
+                                      Join Meeting
+                                    </button>
+                                  </div>
+                                )}
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
                     <div className="bg-white p-4 rounded-lg border-2 border-[#E7F0FA] mb-4">

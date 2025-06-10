@@ -24,6 +24,8 @@ import { AppDispatch } from "../../redux/store";
 import { useDispatch } from "react-redux";
 import { setProfileURL } from "../../features/auth/authSlice";
 import { LoadingSpinner } from "../../components/Common";
+import { useNavigate } from "react-router-dom";
+import resumeService from "../../services/resume-service";
 
 interface Option {
   label: string;
@@ -35,7 +37,7 @@ const CandidateProfile = () => {
   const [candidateProfileData, setCandidateProfileData] =
     useState<ICandidateProfileDataResponse>();
   const [loading, setLoading] = useState<boolean>(false);
-
+  const navigate = useNavigate();
   const candidateProfileInitialValues: CandidateProfileFormValues = {
     phone_number: candidateProfileData?.phone_number || "",
     resume: candidateProfileData?.resume_url || "",
@@ -125,6 +127,39 @@ const CandidateProfile = () => {
       setSubmitting(false);
     }
   };
+    const handleResumeSubmit = async () => {
+        try {
+
+            const payload : any= {
+                _id: candidateProfileData?.id,
+                user: candidateProfileData?.user,
+                fullName: candidateProfileData?.full_name,
+                lastName:  "",
+                jobTitle: candidateProfileData?.position,
+                address: candidateProfileData?.location,
+                email: candidateProfileData?.email,
+                phone: candidateProfileData?.phone_number,
+                about: candidateProfileData?.bio,
+                degree: candidateProfileData?.education,
+                 educationDetails:[{
+                 degree: candidateProfileData?.education || '',
+                 }]
+            };
+
+            await resumeService.createResume(payload);
+            await getResumeInfo();
+        } catch (error) {
+            console.error("Error submitting resume:", error);
+        }
+    };
+       const getResumeInfo = async () => {
+            try {
+               await resumeService.getResumeData();
+              
+            } catch (error) {
+                console.error('Failed to fetch resume:', error);
+            }
+        };
 
   return (
     <div className="sm:p-6">
@@ -144,189 +179,203 @@ const CandidateProfile = () => {
             onSubmit={handleSubmit}
           >
             {({ errors, touched, setFieldValue, values, isSubmitting }) => (
-           <Form className="grid grid-cols-1 gap-6 w-full">
+              <Form className="grid grid-cols-1 gap-6 w-full">
 
-            {/* Personal Details */}
-            <div className="text-lg font-semibold text-black-800">Personal Details</div>
-            <div className="grid grid-cols-4 gap-4">
-              <div className="w-full col-span-4 md:col-span-2 lg:col-span-1">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {FORM_LABELS.PROFILE_PIC}
-                </label>
-                <PhotoUpload
-                  profile_pic={values.profile_pic || ""}
-                  aspectRatio="wide"
-                  setFieldValue={setFieldValue}
-                  error={errors.profile_pic}
-                  touched={touched.profile_pic}
+                {/* Personal Details */}
+                <div className="text-lg font-semibold text-gray-800 mb-4">Personal Details</div>
+
+                <div className="grid grid-cols-4 gap-4">
+             
+                  <div className="w-full col-span-4 md:col-span-2 lg:col-span-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {FORM_LABELS.PROFILE_PIC}
+                    </label>
+                    <PhotoUpload
+                      profile_pic={values.profile_pic || ""}
+                      aspectRatio="wide"
+                      setFieldValue={setFieldValue}
+                      error={errors.profile_pic}
+                      touched={touched.profile_pic}
+                    />
+                    {errors.profile_pic && touched.profile_pic && (
+                      <div className="text-red-500 text-sm mt-1">{errors.profile_pic}</div>
+                    )}
+                  </div>
+
+                  <div className="w-full col-span-4 lg:col-span-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {FORM_LABELS.RESUME}
+                    </label>
+                    <ResumeUpload
+                      resume_url={values.resume || ""}
+                      setFieldValue={setFieldValue}
+                      helpText="Max file size: 1MB"
+                      error={errors.resume}
+                      touched={touched.resume}
+                    />
+                    {errors.resume && touched.resume && (
+                      <div className="text-red-500 text-sm mt-1">{errors.resume}</div>
+                    )}
+                   
+                    {values.resume === null && (
+                    <div className="mt-6">
+                      <button
+                        onClick={() =>{ handleResumeSubmit(); navigate(`/resumeBuilder/${candidateProfileData?.user}`)}}
+                        className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition duration-200"
+                      >
+                        Build Your Resume
+                      </button>
+                    </div>
+                    )}
+                  </div>
+                </div>
+
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    id="phone_number"
+                    label={FORM_LABELS.PHONE_NUMBER}
+                    value={values.phone_number}
+                    error={errors.phone_number}
+                    touched={touched.phone_number}
+                    onChange={(e) => setFieldValue("phone_number", e.target.value)}
+                    placeholder={PLACEHOLDERS.PHONE_NUMBER}
+                  />
+                  <FormField
+                    id="nationality"
+                    label={FORM_LABELS.NATIONALITY}
+                    value={values.nationality}
+                    error={errors.nationality}
+                    touched={touched.nationality}
+                    onChange={(e) => setFieldValue("nationality", e.target.value)}
+                    placeholder={PLACEHOLDERS.NATIONALITY}
+                  />
+                </div>
+
+                {/* Professional Details */}
+                <div className="text-lg font-semibold text-black-800 mt-4">Professional Details</div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    id="position"
+                    label={FORM_LABELS.POSITION}
+                    value={values.position}
+                    error={errors.position}
+                    touched={touched.position}
+                    onChange={(e) => setFieldValue("position", e.target.value)}
+                    placeholder={PLACEHOLDERS.POSITION}
+                  />
+                  <FormField
+                    id="previous_experience"
+                    label={FORM_LABELS.PREVIOUS_EXPERIENCE}
+                    value={values.previous_experience}
+                    error={errors.previous_experience}
+                    touched={touched.previous_experience}
+                    onChange={(e) => setFieldValue("previous_experience", e.target.value)}
+                    placeholder={PLACEHOLDERS.PREVIOUS_EXPERIENCE}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    id="total_experience"
+                    label={FORM_LABELS.TOTAL_EXPERIENCE}
+                    type="number"
+                    value={String(values.total_experience)}
+                    error={errors.total_experience}
+                    touched={touched.total_experience}
+                    onChange={(e) => setFieldValue("total_experience", Number(e.target.value))}
+                    placeholder={PLACEHOLDERS.TOTAL_EXPERIENCE}
+                  />
+                  <SelectField
+                    id="location"
+                    label={FORM_LABELS.LOCATION}
+                    value={values.location}
+                    error={errors.location}
+                    touched={touched.location}
+                    options={locationOptions}
+                    onValueChange={(value) => setFieldValue("location", value)}
+                    placeholder={PLACEHOLDERS.LOCATION}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    id="current_sal"
+                    label={FORM_LABELS.CURRENT_SALARY}
+                    type="number"
+                    value={String(values.current_sal)}
+                    error={errors.current_sal}
+                    touched={touched.current_sal}
+                    onChange={(e) => setFieldValue("current_sal", Number(e.target.value))}
+                    placeholder={PLACEHOLDERS.CURRENT_SALARY}
+                  />
+                  <FormField
+                    id="expected_sal"
+                    label={FORM_LABELS.EXPECTED_SALARY}
+                    type="number"
+                    value={String(values.expected_sal)}
+                    error={errors.expected_sal}
+                    touched={touched.expected_sal}
+                    onChange={(e) => setFieldValue("expected_sal", Number(e.target.value))}
+                    placeholder={PLACEHOLDERS.EXPECTED_SALARY}
+                  />
+                </div>
+
+                <FormField
+                  id="headline"
+                  label={FORM_LABELS.HEADLINE}
+                  value={values.headline}
+                  error={errors.headline}
+                  touched={touched.headline}
+                  onChange={(e) => setFieldValue("headline", e.target.value)}
+                  placeholder={PLACEHOLDERS.HEADLINE}
                 />
-                {errors.profile_pic && touched.profile_pic && (
-                  <div className="text-red-500 text-sm">{errors.profile_pic}</div>
-                )}
-              </div>
-              <div className="w-full col-span-4 lg:col-span-3">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {FORM_LABELS.RESUME}
-                </label>
-                <ResumeUpload
-                  resume_url={values.resume || ""}
-                  setFieldValue={setFieldValue}
-                  helpText="Max file size: 1MB"
-                  error={errors.resume}
-                  touched={touched.resume}
+
+                {/* Educational Details */}
+                <div className="text-lg font-semibold text-black-800 mt-4">Educational Details</div>
+                <SelectField
+                  id="education"
+                  label={FORM_LABELS.EDUCATION}
+                  value={values.education}
+                  options={educationOptions}
+                  error={errors.education}
+                  touched={touched.education}
+                  onValueChange={(value) => setFieldValue("education", value)}
+                  placeholder={PLACEHOLDERS.EDUCATION}
                 />
-                {errors.resume && touched.resume && (
-                  <div className="text-red-500 text-sm">{errors.resume}</div>
-                )}
-              </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                id="phone_number"
-                label={FORM_LABELS.PHONE_NUMBER}
-                value={values.phone_number}
-                error={errors.phone_number}
-                touched={touched.phone_number}
-                onChange={(e) => setFieldValue("phone_number", e.target.value)}
-                placeholder={PLACEHOLDERS.PHONE_NUMBER}
-              />
-              <FormField
-                id="nationality"
-                label={FORM_LABELS.NATIONALITY}
-                value={values.nationality}
-                error={errors.nationality}
-                touched={touched.nationality}
-                onChange={(e) => setFieldValue("nationality", e.target.value)}
-                placeholder={PLACEHOLDERS.NATIONALITY}
-              />
-            </div>
+                {/* Bio */}
+                <div className="w-full">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {FORM_LABELS.BIO}
+                  </label>
+                  <Textarea
+                    id="bio"
+                    name="bio"
+                    value={values.bio}
+                    onChange={(e) => setFieldValue("bio", e.target.value)}
+                    placeholder={PLACEHOLDERS.BIO}
+                    className={`min-h-[200px] ${errors.bio && touched.bio
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-blue-500"
+                      }`}
+                  />
+                  {errors.bio && touched.bio && (
+                    <div className="text-red-500 text-sm">{errors.bio}</div>
+                  )}
+                </div>
 
-            {/* Professional Details */}
-            <div className="text-lg font-semibold text-black-800 mt-4">Professional Details</div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                id="position"
-                label={FORM_LABELS.POSITION}
-                value={values.position}
-                error={errors.position}
-                touched={touched.position}
-                onChange={(e) => setFieldValue("position", e.target.value)}
-                placeholder={PLACEHOLDERS.POSITION}
-              />
-              <FormField
-                id="previous_experience"
-                label={FORM_LABELS.PREVIOUS_EXPERIENCE}
-                value={values.previous_experience}
-                error={errors.previous_experience}
-                touched={touched.previous_experience}
-                onChange={(e) => setFieldValue("previous_experience", e.target.value)}
-                placeholder={PLACEHOLDERS.PREVIOUS_EXPERIENCE}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                id="total_experience"
-                label={FORM_LABELS.TOTAL_EXPERIENCE}
-                type="number"
-                value={String(values.total_experience)}
-                error={errors.total_experience}
-                touched={touched.total_experience}
-                onChange={(e) => setFieldValue("total_experience", Number(e.target.value))}
-                placeholder={PLACEHOLDERS.TOTAL_EXPERIENCE}
-              />
-              <SelectField
-                id="location"
-                label={FORM_LABELS.LOCATION}
-                value={values.location}
-                error={errors.location}
-                touched={touched.location}
-                options={locationOptions}
-                onValueChange={(value) => setFieldValue("location", value)}
-                placeholder={PLACEHOLDERS.LOCATION}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                id="current_sal"
-                label={FORM_LABELS.CURRENT_SALARY}
-                type="number"
-                value={String(values.current_sal)}
-                error={errors.current_sal}
-                touched={touched.current_sal}
-                onChange={(e) => setFieldValue("current_sal", Number(e.target.value))}
-                placeholder={PLACEHOLDERS.CURRENT_SALARY}
-              />
-              <FormField
-                id="expected_sal"
-                label={FORM_LABELS.EXPECTED_SALARY}
-                type="number"
-                value={String(values.expected_sal)}
-                error={errors.expected_sal}
-                touched={touched.expected_sal}
-                onChange={(e) => setFieldValue("expected_sal", Number(e.target.value))}
-                placeholder={PLACEHOLDERS.EXPECTED_SALARY}
-              />
-            </div>
-
-            <FormField
-              id="headline"
-              label={FORM_LABELS.HEADLINE}
-              value={values.headline}
-              error={errors.headline}
-              touched={touched.headline}
-              onChange={(e) => setFieldValue("headline", e.target.value)}
-              placeholder={PLACEHOLDERS.HEADLINE}
-            />
-
-            {/* Educational Details */}
-            <div className="text-lg font-semibold text-black-800 mt-4">Educational Details</div>
-            <SelectField
-              id="education"
-              label={FORM_LABELS.EDUCATION}
-              value={values.education}
-              options={educationOptions}
-              error={errors.education}
-              touched={touched.education}
-              onValueChange={(value) => setFieldValue("education", value)}
-              placeholder={PLACEHOLDERS.EDUCATION}
-            />
-
-            {/* Bio */}
-            <div className="w-full">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {FORM_LABELS.BIO}
-              </label>
-              <Textarea
-                id="bio"
-                name="bio"
-                value={values.bio}
-                onChange={(e) => setFieldValue("bio", e.target.value)}
-                placeholder={PLACEHOLDERS.BIO}
-                className={`min-h-[200px] ${
-                  errors.bio && touched.bio
-                    ? "border-red-500 focus:ring-red-500"
-                    : "border-gray-300 focus:ring-blue-500"
-                }`}
-              />
-              {errors.bio && touched.bio && (
-                <div className="text-red-500 text-sm">{errors.bio}</div>
-              )}
-            </div>
-
-            {/* Submit */}
-            <div className="flex justify-end">
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-all duration-200 transform hover:scale-105"
-              >
-                {isSubmitting ? UI_TEXT.proccesing : UI_TEXT.saveProfile}
-              </Button>
-            </div>
-          </Form>
+                {/* Submit */}
+                <div className="flex justify-end">
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-all duration-200 transform hover:scale-105"
+                  >
+                    {isSubmitting ? UI_TEXT.proccesing : UI_TEXT.saveProfile}
+                  </Button>
+                </div>
+              </Form>
 
             )}
           </Formik>

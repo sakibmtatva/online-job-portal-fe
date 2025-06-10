@@ -1,8 +1,8 @@
 import Layout from "../../components/LoggedInlayout/LoggedInLayout";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
-import { UI_TEXT } from "../../config/config";
 import ScheduledMeetingsListing from "./ScheduleMeetings";
+import CandidateMeetings from "./CandidateMeetings";
 
 const ScheduledMeetings = () => {
   const role = useSelector(
@@ -14,9 +14,7 @@ const ScheduledMeetings = () => {
       {role === "Employer" ? (
         <ScheduledMeetingsListing />
       ) : (
-        <div className="text-center text-red-500 font-medium">
-          {UI_TEXT.notAuthorizedToPerform}
-        </div>
+        <CandidateMeetings />
       )}
     </Layout>
   );

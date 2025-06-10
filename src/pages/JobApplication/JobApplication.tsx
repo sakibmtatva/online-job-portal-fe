@@ -239,7 +239,7 @@ const JobApplication = () => {
                       <div className="flex flex-row justify-between items-center">
                         <div className="text-base font-medium">
                           {col.name}
-                          {`(${filteredCandidates?.length})` || 0}
+                          {`(${filteredCandidates?.length ?? 0})`}
                         </div>
                         {col.name !== "All Applications" &&
                           col.name !== "Shortlisted" && (

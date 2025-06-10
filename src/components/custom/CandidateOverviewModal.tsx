@@ -1,6 +1,5 @@
 import {
   Calendar,
-  CircleArrowRight,
   Download,
   FileText,
   GraduationCap,
@@ -67,6 +66,7 @@ const CandidateOverviewModal = ({
         formData
       );
     } catch (error) {
+      console.error("Error scheduling meeting:", error);
     } finally {
       setSubmitting(false);
       togglePicker();
@@ -86,7 +86,7 @@ const CandidateOverviewModal = ({
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 cursor-pointer"
         >
           <X size={24} />
         </button>
@@ -113,13 +113,13 @@ const CandidateOverviewModal = ({
             </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
-            <Button
+            {/* <Button
               variant="outline"
               className="bg-white cursor-pointer text-[#0A65CC] border-[#0A65CC] rounded-sm px-4 py-2 hover:bg-white hover:text-[#0A65CC] flex items-center justify-center gap-2"
             >
               <Mail className="w-[20px] h-[20px]" />
               <span>{UI_TEXT.sendMail}</span>
-            </Button>
+            </Button> */}
             <div style={{ position: "relative", display: "inline-block" }}>
               <Button
                 variant="outline"
@@ -130,7 +130,7 @@ const CandidateOverviewModal = ({
                 <span>{UI_TEXT.scheduleMeeting}</span>
               </Button>
               {showPicker && (
-                <div className="absolute top-full w-full sm:w-auto left-0 mt-2 bg-white border border-gray-300 rounded-md shadow-lg p-4 z-50">
+                <div className="absolute min-w-[250px] top-full w-full sm:w-auto right-0 mt-2 bg-white border border-gray-300 rounded-md shadow-lg p-4 z-50">
                   <Formik
                     initialValues={{ date: "", startTime: "", endTime: "" }}
                     validationSchema={ScheduleSchema}
@@ -218,10 +218,10 @@ const CandidateOverviewModal = ({
                 </div>
               )}
             </div>
-            <Button className="bg-[#0A65CC] cursor-pointer text-white border-[#0A65CC] rounded-sm px-4 py-2 hover:bg-[#0A65CC] flex items-center justify-center gap-2">
+            {/* <Button className="bg-[#0A65CC] cursor-pointer text-white border-[#0A65CC] rounded-sm px-4 py-2 hover:bg-[#0A65CC] flex items-center justify-center gap-2">
               <CircleArrowRight className="w-[20px] h-[20px]" />
               <span>{UI_TEXT.hireCandidates}</span>
-            </Button>
+            </Button> */}
           </div>
         </div>
         <div className="p-4">

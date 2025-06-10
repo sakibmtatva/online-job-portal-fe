@@ -42,13 +42,14 @@ const EditMeetingForm = ({
       await schedulemeetingService.editMeeting(meetingData._id, formData);
       onSuccess();
     } catch (error) {
+      console.error(error);
     } finally {
       setSubmitting(false);
     }
   };
   return (
     <div className="sm:p-6">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center w-full max-w-4xl">
         <div className="text-black font-bold text-2xl">
           {UI_TEXT.editMeeting}
         </div>
@@ -60,23 +61,23 @@ const EditMeetingForm = ({
           Back
         </Button>
       </div>
-      <div className="p-4 border border-gray-400  mt-6 rounded-lg">
+      <div className="p-4 border border-gray-300 mt-6 rounded-lg w-full max-w-4xl">
         <Formik
           initialValues={initialValues}
           validationSchema={ScheduleSchema}
           onSubmit={editMeeting}
         >
           {({ touched, errors, isSubmitting }) => (
-            <Form className="grid grid-cols-1 gap-4 w-full">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex flex-col">
-                  <label className="text-sm font-medium text-gray-700 mb-1">
+            <Form className="flex flex-col space-y-6 w-full">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex flex-col space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
                     {UI_TEXT.selectDate}
                   </label>
                   <Field
                     name="date"
                     type="date"
-                    className={`px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 ${
+                    className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 ${
                       touched.date && errors.date
                         ? "border-red-500 focus:ring-red-500"
                         : "border-gray-300 focus:ring-blue-500"
@@ -85,17 +86,17 @@ const EditMeetingForm = ({
                   <ErrorMessage
                     name="date"
                     component="div"
-                    className="text-red-600 text-sm mt-1"
+                    className="text-red-600 text-xs"
                   />
                 </div>
-                <div className="flex flex-col">
-                  <label className="text-sm font-medium text-gray-700 mb-1">
+                <div className="flex flex-col space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
                     Start Time
                   </label>
                   <Field
                     name="startTime"
                     type="time"
-                    className={`px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 ${
+                    className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 ${
                       touched.startTime && errors.startTime
                         ? "border-red-500 focus:ring-red-500"
                         : "border-gray-300 focus:ring-blue-500"
@@ -104,19 +105,19 @@ const EditMeetingForm = ({
                   <ErrorMessage
                     name="startTime"
                     component="div"
-                    className="text-red-600 text-sm mt-1"
+                    className="text-red-600 text-xs"
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex flex-col">
-                  <label className="text-sm font-medium text-gray-700 mb-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex flex-col space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
                     End Time
                   </label>
                   <Field
                     name="endTime"
                     type="time"
-                    className={`px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 ${
+                    className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 ${
                       touched.endTime && errors.endTime
                         ? "border-red-500 focus:ring-red-500"
                         : "border-gray-300 focus:ring-blue-500"
@@ -125,15 +126,15 @@ const EditMeetingForm = ({
                   <ErrorMessage
                     name="endTime"
                     component="div"
-                    className="text-red-600 text-sm mt-1"
+                    className="text-red-600 text-xs"
                   />
                 </div>
               </div>
-              <div className="flex justify-end gap-2 pt-2">
+              <div className="flex justify-end pt-4">
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-all duration-200 transform hover:scale-105"
+                  className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition-all duration-200 transform hover:scale-105 cursor-pointer"
                 >
                   {isSubmitting ? UI_TEXT.proccesing : UI_TEXT.editMeeting}
                 </Button>

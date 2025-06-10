@@ -11,7 +11,7 @@ export interface Meeting {
   _id: string;
   candidate: Candidate;
   job: Job;
-  scheduled_by: string | ScheduledBy;
+  scheduled_by: string & ScheduledBy;
   date: string;
   start_time: string;
   end_time: string;

@@ -7,6 +7,7 @@ import {
   Users,
   Bookmark,
   Headset,
+  Crown
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import LogoutDialog from "./LogoutDialog";
@@ -45,6 +46,11 @@ const Sidebar = ({ role }: SidebarProps) => {
             path: "/bookmarkedCandidates",
           },
           {
+            icon: <Crown />,
+            label: "Subscriptions",
+            path: "/subscriptions",
+          },
+          {
             icon: <Headset />,
             label: "Scheduled Meetings",
             path: "/meetings",
@@ -62,6 +68,11 @@ const Sidebar = ({ role }: SidebarProps) => {
             icon: <Bookmark />,
             label: "Favorite Jobs",
             path: "/bookmarkedjobs",
+          },
+          {
+            icon: <Headset />,
+            label: "Scheduled Meetings",
+            path: "/meetings",
           },
         ]
       : []),

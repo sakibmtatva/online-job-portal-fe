@@ -9,8 +9,9 @@ import moment from "moment";
 import EditMeetingForm from "./EditScheduleMeeting";
 import { dismissMeeting } from "../../features/meeting/meetingSlice";
 import { useDispatch } from "react-redux";
+import { Clock } from "lucide-react";
 
-const ScheduledMeetingsListing = () => {
+const CandidateMeetings = () => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
@@ -31,7 +32,7 @@ const ScheduledMeetingsListing = () => {
       setMeetingsData(response?.data?.data || []);
       setTotalCount(response?.data?.pagination?.total || 0);
     } catch (error) {
-      console.error("Error fetching scheduled meetings:", error);
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -41,19 +42,6 @@ const ScheduledMeetingsListing = () => {
     if (page >= 1 && page <= totalPages) {
       setPage(page);
     }
-  };
-
-  const changeStatus = async (meetingId: string) => {
-    try {
-      await schedulemeetingService.changeStatusToCancelled(meetingId);
-      getScheduleMeetingsList(false);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const handleClickEditButton = (meeting: Meeting) => {
-    setSelectedMeetingsData(meeting);
   };
 
   const handleClickBackButton = () => {
@@ -92,7 +80,7 @@ const ScheduledMeetingsListing = () => {
               <thead className="bg-gray-100 text-gray-700 sticky top-0 z-10">
                 <tr>
                   {[
-                    "Candidate Name",
+                    "Employer Name",
                     "Email",
                     "Job Title",
                     "Date",
@@ -129,10 +117,10 @@ const ScheduledMeetingsListing = () => {
                       className="hover:bg-gray-50 transition"
                     >
                       <td className="p-3 border-b whitespace-nowrap">
-                        {meeting.candidate.full_name}
+                        {meeting.scheduled_by.full_name}
                       </td>
                       <td className="p-3 border-b whitespace-nowrap">
-                        {meeting.candidate.email}
+                        {meeting.scheduled_by.email}
                       </td>
                       <td className="p-3 border-b whitespace-nowrap">
                         {meeting.job.job_title}
@@ -178,20 +166,11 @@ const ScheduledMeetingsListing = () => {
                                 </button>
                               </div>
                             ) : (
-                              <div className="flex space-x-2">
-                                <button
-                                  onClick={() => handleClickEditButton(meeting)}
-                                  className="text-blue-600 hover:underline font-medium"
-                                >
-                                  Edit
-                                </button>
-                                <button
-                                  onClick={() => changeStatus(meeting._id)}
-                                  className="text-red-600 hover:underline font-medium"
-                                >
-                                  Cancel
-                                </button>
-                              </div>
+                              <Clock
+                                className="text-gray-400 ml-6"
+                                height="20px"
+                                width="20px"
+                              />
                             )}
                           </div>
                         ) : (
@@ -219,4 +198,4 @@ const ScheduledMeetingsListing = () => {
   );
 };
 
-export default ScheduledMeetingsListing;
+export default CandidateMeetings;

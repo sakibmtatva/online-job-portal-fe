@@ -14,6 +14,7 @@ export interface ICandidateProfileUpdateRequest {
 
 export interface ICandidateProfileDataResponse {
   _id: string;
+  id?:string;
   user: string;
   certifications: string[];
   createdAt: string;

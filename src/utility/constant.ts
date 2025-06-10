@@ -1,3 +1,5 @@
+import { Plan } from "./interface/ISubscription";
+
 export const FORM_LABELS = {
   POSITION: "Designation",
   PREVIOUS_EXPERIENCE: "Previous Experience",
@@ -271,3 +273,55 @@ export const Contact_content = {
   inputMessage: "Message",
   sendMessage: "Send Message",
 };
+
+export const plans: Plan[] = [
+  {
+    id: 1,
+    name: "Starter",
+    duration: "/month",
+    currency: { name: "USD", symbole: "$" },
+    price: 0,
+    description: "Perfect for individuals trying out our platform with basic access.",
+    features: [
+      "✅ Schedule up to 3 meetings/month",
+      "✅ Access public events & webinars",
+      "❌ AI-powered resume builder",
+      "❌ Job posting access",
+      "❌ Email support",
+    ],
+  },
+  {
+    id: 2,
+    name: "Pro",
+    duration: "/month",
+    currency: { name: "USD", symbole: "$" },
+    price: 10,
+    description: "Ideal for job seekers and small recruiters who need more flexibility and tools.",
+    features: [
+      "✅ Unlimited meeting scheduling",
+      "✅ AI-powered resume builder (5 resumes/month)",
+      "✅ Post up to 10 jobs/month",
+      "✅ Access to applicant tracking tools",
+      "✅ Standard email support",
+    ],
+    paymentLink: import.meta.env.VITE_STRIP_MONTHLY_PLAN_LINK,
+    priceId: import.meta.env.VITE_STRIP_MONTHLY_PRICE_ID,
+  },
+  {
+    id: 3,
+    name: "Enterprise",
+    duration: "/year",
+    currency: { name: "USD", symbole: "$" },
+    price: 99,
+    description: "Best for organizations looking to scale hiring with full access and support.",
+    features: [
+      "✅ Unlimited meetings & job posts",
+      "✅ AI-powered resume builder (unlimited)",
+      "✅ Branded career page setup",
+      "✅ Advanced analytics & reporting",
+      "✅ Priority support (24/7)",
+    ],
+    paymentLink: import.meta.env.VITE_STRIP_YEARLY_PLAN_LINK,
+    priceId: import.meta.env.VITE_STRIP_YEARLY_PRICE_ID,
+  },
+];
